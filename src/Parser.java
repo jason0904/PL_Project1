@@ -1,14 +1,15 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class Parser {
 
     private boolean errorFlag = false;
+
+    private boolean waringFlag = false;
     
-    private boolean optionFlag = false;
+    private final boolean optionFlag;
+
+    private String errorCode;
 
     private static boolean IdentFlag = false;
     private String charClass;
@@ -16,7 +17,7 @@ public class Parser {
 
     private String LHS;
 
-    private static List<String> IdentList = new ArrayList<>();
+    private static TreeSet<String> IdentList = new TreeSet<>();
 
     List<String> lexemes = new ArrayList<>();
 
@@ -27,13 +28,17 @@ public class Parser {
 
     private String expr;
 
+    private String savedExpr;
+
 
 
 
     private int[] result = new int[3]; //0 ID, 1 CONST, 2 OP
 
-    Parser(String expr) {
+    Parser(String expr, Boolean optionFlag) {
         this.expr = expr;
+        this.savedExpr = expr;
+        this.optionFlag = optionFlag;
         lexLen = 0;
         nextToken = "";
         lexeme = "";
@@ -93,7 +98,7 @@ public class Parser {
                     break;
                 }
                 else {
-                    System.out.println("Error");
+                    errorCode = "Unexpected operator";
                 }
                 result[2]--;
                 break;
@@ -118,7 +123,7 @@ public class Parser {
             lexeme += nextChar;
             lexLen++;
         } else {
-            System.out.println("Error - lexeme is too long \n");
+            errorCode = "lexeme is too long";
         }
     }
 
@@ -173,7 +178,9 @@ public class Parser {
                 getchar();
                 break;
         }
-        System.out.println("Next token is: " + nextToken + ", Next lexeme is " + lexeme);
+        if(optionFlag) {
+            System.out.println("Next token is: " + nextToken + ", Next lexeme is " + lexeme);
+        }
         resetLexeme();
     }
 
@@ -191,15 +198,18 @@ public class Parser {
                 lex();
                 return expression();
             } else {
-                System.out.println("Error - expected assignment operator");
+                errorCode = "Many assignment operator";
                 errorFlag = true;
             }
         } else {
             if(nextToken.equals(String.valueOf(Token.ASSIGN_OP))) {
-                System.out.println("Error - assignment operator without identifier");
+                errorCode = "Unexpected assignment operator";
+                errorFlag = true;
             }
-            System.out.println("Error - expected identifier");
-            errorFlag = true;
+            else {
+                errorCode = "Unexpected identifier";
+                errorFlag = true;
+            }
         }
         return 0;
     }
@@ -290,24 +300,27 @@ public class Parser {
                 lex();
                 return tmp;
             } else {
-                System.out.println("(Error) - expected right parenthesis");
+                errorCode = "expected right parenthesis";
                 errorFlag = true;
                 return 0;
             }
         } else if(nextToken.equals(String.valueOf(Token.IDENT))) {
             if(!IdentValue.containsKey(lexemes.get(lexemes.size() - 1))) {
-                System.out.println("(Error) - identifier not found");
+                errorCode = "Undefined identifier";
                 errorFlag = true;
                 IdentFlag = true;
-                return 0;
+                if(IdentList.contains(lexemes.get(lexemes.size() - 1))) {
+                    IdentValue.put(lexemes.get(lexemes.size() - 1), 0);
+                }
             }
-            else {
-                lex();
-                if(nextToken.equals(String.valueOf(Token.EOF))) {
+            lex();
+            if(!errorFlag) {
+                if (nextToken.equals(String.valueOf(Token.EOF))) {
                     return IdentValue.get(lexemes.get(lexemes.size() - 1));
                 }
                 return IdentValue.get(lexemes.get(lexemes.size() - 2));
             }
+            return 0;
         } else if(nextToken.equals(String.valueOf(Token.INT_LIT))) {
             lex();
             if(nextToken.equals(String.valueOf(Token.EOF))) {
@@ -315,7 +328,7 @@ public class Parser {
             }
             return Integer.parseInt(lexemes.get(lexemes.size() - 2));
         } else {
-            System.out.println("(Error) - expected left parenthesis, identifier, or integer literal");
+            errorCode = "Unexpected token";
             errorFlag = true;
             return 0;
         }
@@ -323,12 +336,13 @@ public class Parser {
     void run() {
         lex();
         int num = statement();
+        System.out.println("Statement : " + savedExpr);
         System.out.println("ID : " + result[0] + " CONST : " + result[1] + " OP : " + result[2]);
         if(!errorFlag) {
             System.out.println("(OK)");
         }
         else {
-            System.out.println("(Error)");
+            System.out.println("(Error) - " + errorCode);
         }
         if(IdentValue.containsKey(LHS)) {
             updateIdentValue(LHS, num);

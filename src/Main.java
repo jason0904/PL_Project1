@@ -9,6 +9,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         boolean optionFlag = false;
+        /*
         if(args.length == 0 || args.length > 2) {
             System.out.println("Error");
             System.exit(1);
@@ -20,16 +21,22 @@ public class Main {
         if(args[0].equals("-v")) {
             optionFlag = true;
         }
+
         Scanner scanner = new Scanner(new File(args[args.length-1]));
-        List<String> lines = new ArrayList<>();
+
+        String lines = "";
         while(scanner.hasNextLine()) {
-            lines.add(scanner.nextLine());
+            lines += scanner.nextLine();
         }
         scanner.close();
+         */
+        String tmp = "operand2 := operand1 + 2 ;\n" +
+                "target := operand1 + operand2 * 3\n";
         //개행문자 제거후 한 문장으로 묶기
-        String input = String.join("", lines).replaceAll("\\s+", "");
+        String input;
+        input = tmp.replaceAll("\n", "");
         Program program = new Program(input);
-        program.run();
+        program.run(optionFlag);
     }
 
 }
