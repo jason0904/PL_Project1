@@ -1,0 +1,6 @@
+public enum Token {
+    INT_LIT, IDENT, ASSIGN_OP, ADD_OP, MULT_OP, LEFT_PAREN, RIGHT_PAREN, EOF
+}
+
+
+
