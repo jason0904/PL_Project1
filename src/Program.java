@@ -3,17 +3,17 @@ import java.util.List;
 
 public class Program {
 
-    private String input;
+    private final String input;
     private List<String>Statements = new ArrayList<>();
 
 
     Program(String input) {
         this.input = input;
-        this.Statements = splitStatements(input);
+        this.Statements = splitStatements();
     }
 
     //문장을 ;기준으로 나누어 리스트에 저장
-    private List<String> splitStatements(String input) {
+    private List<String> splitStatements() {
         List<String> result = new ArrayList<>();
         String[] tmp = input.split(";");
         for(String statement : tmp) {
