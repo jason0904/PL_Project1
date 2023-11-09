@@ -29,9 +29,11 @@ public class Main {
             lines += scanner.nextLine();
         }
         scanner.close();
-         */
-        String tmp = "operand2 := operand1 + 2 ;\n" +
-                "target := operand1 + operand2 * 3\n";
+        */
+        String tmp = "c := 1 + 1;\n" +
+                "py := 2 % 2;\n" +
+                "rs := 3 * 3;\n" +
+                "rb := 4 $ 4";
         //개행문자 제거후 한 문장으로 묶기
         String input;
         input = tmp.replaceAll("\n", "");

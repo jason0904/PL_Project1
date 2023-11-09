@@ -19,6 +19,9 @@ public class Program {
         for(String statement : tmp) {
             result.add(statement.trim());
         }
+        for(int i = 0; i < result.size() - 1; i++) {
+            result.set(i, result.get(i) + ";");
+        }
         return result;
     }
 
