@@ -7,13 +7,12 @@ public class Parser {
     private static boolean errorFlag2 = false;
     private final boolean optionFlag;
     private boolean assignFlag = false;
-    private String errorCode;
     private String charClass;
     private String lexeme;
     private String LHS;
     private static final TreeSet<String> IdentList = new TreeSet<>();
-    List<String> lexemes = new ArrayList<>();
-    List<Pair> errors = new ArrayList<>();
+    private final List<String> lexemes = new ArrayList<>();
+    private final List<Pair> errors = new ArrayList<>();
     private static final HashMap<String, Integer> IdentValue = new HashMap<>();
     private char nextChar;
     private int lexLen;
@@ -36,6 +35,10 @@ public class Parser {
 
     void updateIdentValue(String ident, Integer value) {
         IdentValue.replace(ident, value);
+    }
+
+    public void addErrors(Pair pair) {
+        errors.add(pair);
     }
 
     void addLexeme(String str) {
@@ -78,18 +81,26 @@ public class Parser {
                 getchar();
                 if (nextChar == '=') {
                     addchar();
-                    nextToken = String.valueOf(Token.ASSIGN_OP);
-                    addLexeme(lexeme);
-                    result[2]--;
-                    break;
                 } else {
-                    errorCode = "Unexpected operator";
+                    errors.add(new Pair("(Warning)", "Change : to := "));
+                    addchar();
+                    expr = "=" + expr;
                 }
+                nextToken = String.valueOf(Token.ASSIGN_OP);
+                addLexeme(lexeme);
                 result[2]--;
             }
             case ';' -> {
                 addchar();
                 nextToken = String.valueOf(Token.SEMICOLON);
+                addLexeme(lexeme);
+                result[2]--;
+            }
+            case '=' -> {
+                errors.add(new Pair("(Warning)", "Change = to := "));
+                lexeme += ":";
+                addchar();
+                nextToken = String.valueOf(Token.ASSIGN_OP);
                 addLexeme(lexeme);
                 result[2]--;
             }
@@ -100,7 +111,6 @@ public class Parser {
             }
             default -> {
                 errorFlag = true;
-                errorCode = "Unexpected operator";
                 errors.add(new Pair("(Error)", "Unexpected operator"));
                 addchar();
                 addLexeme(lexeme);
@@ -116,7 +126,7 @@ public class Parser {
             lexLen++;
         } else {
             errorFlag = true;
-            errorCode = "lexeme is too long";
+            errors.add(new Pair("(Error)", "Identifier too long"));
         }
     }
 
@@ -170,7 +180,7 @@ public class Parser {
             }
         }
         if (optionFlag) {
-            System.out.println(nextToken);
+            if(!nextToken.equals(String.valueOf(Token.EOF))) System.out.println(lexeme);
         }
         resetLexeme();
     }
@@ -189,25 +199,21 @@ public class Parser {
                 LHS = lexemes.get(lexemes.size() - 2);
                 lex();
                 while (nextToken.equals(String.valueOf(Token.ASSIGN_OP))) {
-                    errors.add(new Pair("(Warning)", "연속되서 나온 연산자"));
-                    System.out.println("Statement에서는 연속된 대입 연산자가 불가능하므로 무시하고 넘어갑니다.");
+                    errors.add(new Pair("(Warning)", "Consecutive Assignment Operator - Remove Duplicate Assignment Operator"));
                     lexemes.remove(lexemes.size() - 1);
                     result[2]--;
                     lex();
                 }
                 return expression();
             } else {
-                errorCode = "No assignment operator";
                 errorFlag = true;
                 errors.add(new Pair("(Error)", "No assignment operator"));
             }
         } else {
             if (nextToken.equals(String.valueOf(Token.ASSIGN_OP))) {
-                errorCode = "Unexpected assignment operator";
                 errorFlag = true;
-                errors.add(new Pair("(Error)", "Unexpected assignment operator"));
+                errors.add(new Pair("(Error)", "Assignment operator cannot be used without identifier"));
             } else {
-                errorCode = "Unexpected identifier";
                 errorFlag = true;
                 errors.add(new Pair("(Error)", "Unexpected identifier"));
             }
@@ -241,35 +247,21 @@ public class Parser {
                 //ADD_OP일때
                 if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
                     if (lexemes.get(lexemes.size() - 1).equals(op)) {
-                        errors.add(new Pair("(Warning)", "중복 연산자 (" + op + ") 제거"));
+                        errors.add(new Pair("(Warning)", "Remove duplicate operator (" + op + ")"));
                         lexemes.remove(lexemes.size() - 1);
 
                     } else {
-                        Scanner scanner = new Scanner(System.in);
-                        System.out.println("연산자가 연속해서 나왔습니다.");
-                        System.out.print("올바른 판단을 위해 “-“와 “+“ 중 하나를 입력하세요 : ");
-                        String tmp = scanner.nextLine();
-                        while (!tmp.equals("+") && !tmp.equals("-")) {
-                            System.out.print("“-“와 “+“ 중 하나를 입력하세요 : ");
-                            tmp = scanner.nextLine();
-                        }
-                        op = tmp;
-                        if (lexemes.get(lexemes.size() - 1).equals(op)) {
-                            lexemes.remove(lexemes.size() - 2);
-                        } else {
-                            lexemes.remove(lexemes.size() - 1);
-                        }
-                        errors.add(new Pair("(Warning)", "연속되서 나온 연산자 - (" + op + ") 선택"));
+                        lexemes.remove(lexemes.size() - 1);
+                        errors.add(new Pair("(Warning)", "Backward operator " + op + "was ignored"));
                     }
                 }
                 //MULT_OP일때
                 else if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
-                    errors.add(new Pair("(Warning)", "연속되서 나온 연산자"));
-                    System.out.println("Term에서는 곱셈과 나눗셈 계산이 불가능하므로 무시하고 넘어갑니다.");
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found"));
+                    System.out.println("Term cannot be calculated with multiplication and division, so ignore" + lexemes.get(lexemes.size()-1) + "and move on.");
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
-                    errorCode = "Unexpected token";
                     errorFlag = true;
                     errors.add(new Pair("(Error)", "Unexpected token"));
                     return new ArrayList<>();
@@ -287,9 +279,8 @@ public class Parser {
             return tmpMap;
         }
         else if(!(nextToken.equals(String.valueOf(Token.SEMICOLON)) || nextToken.equals(String.valueOf(Token.EOF))
-                || nextToken.equals(String.valueOf(Token.RIGHT_PAREN)))) {
+                || nextToken.equals(String.valueOf(Token.RIGHT_PAREN)) || nextToken.equals(String.valueOf(Token.ERROR)))) {
             errorFlag = true;
-            errorCode = "Unexpected token";
             errors.add(new Pair("(Error)", "Unexpected token"));
         }
         return new ArrayList<>();
@@ -321,32 +312,18 @@ public class Parser {
                 //MULT_OP일때
                 if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
                     if (lexemes.get(lexemes.size() - 1).equals(op)) {
-                        errors.add(new Pair("(Warning)", "중복 연산자 (" + op + ") 제거"));
+                        errors.add(new Pair("(Warning)", "Remove duplicate operator (" + op + ")"));
                         lexemes.remove(lexemes.size() - 1);
                     } else {
-                        Scanner scanner = new Scanner(System.in);
-                        System.out.println("연산자가 연속해서 나왔습니다.");
-                        System.out.print("올바른 판단을 위해 “*“와 “/“ 중 하나를 입력하세요 : ");
-                        String tmp = scanner.nextLine();
-                        while (!tmp.equals("*") && !tmp.equals("/")) {
-                            System.out.print("“*“와 “/“ 중 하나를 입력하세요 : ");
-                            tmp = scanner.nextLine();
-                        }
-                        op = tmp;
-                        if (lexemes.get(lexemes.size() - 1).equals(op)) {
-                            lexemes.remove(lexemes.size() - 2);
-                        } else {
-                            lexemes.remove(lexemes.size() - 1);
-                        }
-                        errors.add(new Pair("(Warning)", "연속되서 나온 연산자 - (" + op + ") 선택"));
+                        lexemes.remove(lexemes.size() - 1);
+                        errors.add(new Pair("(Warning)", "Backward operator " + op + "was ignored"));
                     }
                 } else if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
-                    errors.add(new Pair("(Warning)", "연속되서 나온 연산자"));
-                    System.out.println("Factor에서는 덧셈과 뺄셈 계산이 불가능하므로 무시하고 넘어갑니다.");
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found"));
+                    System.out.println("Factor cannot be calculated with addition and subtraction, so ignore" + lexemes.get(lexemes.size()-1) + "and move on.");
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
-                    errorCode = "Unexpected token";
                     errorFlag = true;
                     errors.add(new Pair("(Error)", "Unexpected token"));
                     return new ArrayList<>();
@@ -364,9 +341,8 @@ public class Parser {
             return tmpMap;
         }
         else if(!(nextToken.equals(String.valueOf(Token.SEMICOLON)) || nextToken.equals(String.valueOf(Token.EOF))
-                || nextToken.equals(String.valueOf(Token.ADD_OP)) || nextToken.equals(String.valueOf(Token.RIGHT_PAREN)))) {
+                || nextToken.equals(String.valueOf(Token.ADD_OP)) || nextToken.equals(String.valueOf(Token.RIGHT_PAREN)) || nextToken.equals(String.valueOf(Token.ERROR)))) {
             errorFlag = true;
-            errorCode = "Unexpected token";
             errors.add(new Pair("(Error)", "Unexpected token"));
         }
         return new ArrayList<>();
@@ -380,21 +356,19 @@ public class Parser {
                 lex();
                 return tmp;
             } else {
-                errorCode = "괄호가 닫히지 않았습니다";
-                errorFlag = true;
-                errors.add(new Pair("(Error)", "괄호가 닫히지 않았습니다"));
-                return 0;
+                errors.add(new Pair("(Warning)", "not found right parenthesis - add right parenthesis in the end"));
+                lexemes.add(")");
+                if(optionFlag) System.out.println(")");
+                return tmp;
             }
         } else if (nextToken.equals(String.valueOf(Token.IDENT))) {
             if (!IdentValue.containsKey(lexemes.get(lexemes.size() - 1))) {
                 if (!(IdentList.contains(lexemes.get(lexemes.size() - 1)) && !errorFlag2)) {
-                    errorCode = "Undefined identifier (" + lexemes.get(lexemes.size() - 1) + ")";
                     errorFlag = true;
-                    errors.add(new Pair("(Error)", errorCode));
+                    errors.add(new Pair("(Error)", "Undefined identifier (" + lexemes.get(lexemes.size() - 1) + ")"));
                     IdentValue.put(lexemes.get(lexemes.size() - 1), null);
                 }
                 else if(IdentList.contains(lexemes.get(lexemes.size() - 1))) {
-                    errorCode = "Undefined identifier (" + lexemes.get(lexemes.size() - 1) + ")";
                     errorFlag = true;
                     errors.add(new Pair("(Error)", "Undefined identifier (" + lexemes.get(lexemes.size() - 1) + ")"));
                 }
@@ -417,7 +391,6 @@ public class Parser {
             }
             return Integer.parseInt(lexemes.get(lexemes.size() - 2));
         } else {
-            errorCode = "Unexpected token";
             errorFlag = true;
             errors.add(new Pair("(Error)", "Unexpected token"));
             return 0;
@@ -432,7 +405,15 @@ public class Parser {
             System.out.print("Statement : ");
             StringBuilder stringBuilder = new StringBuilder();
             for (String str : lexemes) {
-                stringBuilder.append(str);
+                if(str.equals("(")) stringBuilder.append(str);
+                else if(str.equals(")") || str.equals(";")) {
+                    if(stringBuilder.charAt(stringBuilder.length() - 1) == ' ') {
+                        stringBuilder.replace(stringBuilder.length() - 1, stringBuilder.length(), str);
+                        stringBuilder.append(" ");
+                    }
+                    else stringBuilder.append(str).append(" ");
+                }
+                else stringBuilder.append(str).append(" ");
             }
             System.out.println(stringBuilder);
             System.out.println("ID : " + result[0] + " CONST : " + result[1] + " OP : " + result[2]);
@@ -449,10 +430,10 @@ public class Parser {
                 } else {
                     setIdentValue(LHS, num);
                 }
-                System.out.println("Result => " + LHS + " = " + IdentValue.get(LHS));
+                //System.out.println("Result => " + LHS + " = " + IdentValue.get(LHS));
             } else {
                 updateIdentValue(LHS, null);
-                System.out.println("Result => " + LHS + " = Unknown ");
+                //System.out.println("Result => " + LHS + " = Unknown ");
             }
             errorFlag2 = errorFlag || errorFlag2;
         }
@@ -473,7 +454,7 @@ public class Parser {
         while (!nextToken.equals(String.valueOf(Token.EOF))) {
             lex();
             if(assignFlag && nextToken.equals(String.valueOf(Token.ASSIGN_OP))) {
-                errors.add(new Pair("(Error)", "Assignment Operator는 하나여야합니다."));
+                errors.add(new Pair("(Error)", "Assignment Operator must be one"));
             }
             else if(nextToken.equals(String.valueOf(Token.IDENT))) {
                 if(!IdentValue.containsKey(lexemes.get(lexemes.size() - 1))) {

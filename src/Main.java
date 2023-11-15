@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         boolean optionFlag = false;
-        /*
+
         if(args.length == 0 || args.length > 2) {
             System.out.println("Error");
             System.exit(1);
@@ -24,19 +24,15 @@ public class Main {
 
         Scanner scanner = new Scanner(new File(args[args.length-1]));
 
-        String lines = "";
+        StringBuilder lines = new StringBuilder();
         while(scanner.hasNextLine()) {
-            lines += scanner.nextLine();
+            lines.append(scanner.nextLine());
         }
         scanner.close();
-        */
-        String tmp = "c := 1 + 1;\n" +
-                "py := 2 % 2;\n" +
-                "rs := 3 * 3;\n" +
-                "rb := 4 $ 4";
+
         //개행문자 제거후 한 문장으로 묶기
         String input;
-        input = tmp.replaceAll("\n", "");
+        input = lines.toString().replaceAll("\n", "");
         Program program = new Program(input);
         program.run(optionFlag);
     }
