@@ -8,11 +8,11 @@ PL_Project1 - Simple Parser
 
 ## How to Run
 ```bash
-java -jar Main.jar /testcase/example1.txt
+java -jar .\Main.jar .\testcase\example1.txt
 ```
 or
 ```bash
-java -jar Main.jar -v /testcase/example.txt
+java -jar .\Main.jar -v .\testcase\example1.txt
 ```
 
 ## Exception Handling
