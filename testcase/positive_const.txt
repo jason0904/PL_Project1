@@ -1,0 +1,3 @@
+operand1 := +5;
+operand2 := -5;
+operand3 := operand1 + operand2

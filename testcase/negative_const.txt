@@ -1,0 +1,2 @@
+operand1 := -1;
+operand2 := -5 * operand1 - -5

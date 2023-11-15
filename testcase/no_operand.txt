@@ -1,0 +1,3 @@
+seoul := 4 + 2;
+wien := 4 + ;
+berlin := seoul + wien
