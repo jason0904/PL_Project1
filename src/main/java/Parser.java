@@ -83,8 +83,7 @@ public class Parser {
                     addchar();
                 } else {
                     errors.add(new Pair("(Warning)", "Change : to := "));
-                    addchar();
-                    expr = "=" + expr;
+                    lexeme += "=";
                 }
                 nextToken = String.valueOf(Token.ASSIGN_OP);
                 addLexeme(lexeme);
