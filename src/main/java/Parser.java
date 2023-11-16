@@ -247,18 +247,17 @@ public class Parser {
                 //ADD_OP일때
                 if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
                     if (lexemes.get(lexemes.size() - 1).equals(op)) {
-                        errors.add(new Pair("(Warning)", "Remove duplicate operator (" + op + ")"));
+                        errors.add(new Pair("(Warning)", "Duplicate operators were found - Remove duplicate operator (" + op + ")"));
                         lexemes.remove(lexemes.size() - 1);
 
                     } else {
                         lexemes.remove(lexemes.size() - 1);
-                        errors.add(new Pair("(Warning)", "Backward operator " + op + " was ignored"));
+                        errors.add(new Pair("(Warning)", "Consecutive operators were found - Backward operator " + op + " was ignored"));
                     }
                 }
                 //MULT_OP일때
                 else if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
-                    errors.add(new Pair("(Warning)", "Consecutive operators were found"));
-                    System.out.println("Term cannot be calculated with multiplication and division, so ignore " + lexemes.get(lexemes.size()-1) + " and move on.");
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove " + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
@@ -312,15 +311,14 @@ public class Parser {
                 //MULT_OP일때
                 if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
                     if (lexemes.get(lexemes.size() - 1).equals(op)) {
-                        errors.add(new Pair("(Warning)", "Remove duplicate operator (" + op + ")"));
+                        errors.add(new Pair("(Warning)", "Duplicate operators were found - Remove duplicate operator (" + op + ")"));
                         lexemes.remove(lexemes.size() - 1);
                     } else {
                         lexemes.remove(lexemes.size() - 1);
-                        errors.add(new Pair("(Warning)", "Backward operator " + op + " was ignored"));
+                        errors.add(new Pair("(Warning)", "Consecutive operators were found - Backward operator " + op + " was ignored"));
                     }
                 } else if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
-                    errors.add(new Pair("(Warning)", "Consecutive operators were found"));
-                    System.out.println("Factor cannot be calculated with addition and subtraction, so ignore " + lexemes.get(lexemes.size()-1) + " and move on.");
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove " + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
