@@ -4,7 +4,7 @@ PL_Project1 - Simple Parser
 ## Build and Test Environment
 - OS : Windows 11
 - Compiler : Amazon Corretto 17
-- Build System : Intellij
+- Build System : Gradle 7.2
 
 ## How to Run
 ```bash
@@ -13,6 +13,11 @@ java -jar .\Main.jar .\testcase\example1.txt
 or
 ```bash
 java -jar .\Main.jar -v .\testcase\example1.txt
+```
+
+## How to Build
+```bash
+.\gradlew build
 ```
 
 ## Exception Handling
