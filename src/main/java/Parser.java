@@ -252,13 +252,13 @@ public class Parser {
 
                     } else {
                         lexemes.remove(lexemes.size() - 1);
-                        errors.add(new Pair("(Warning)", "Backward operator " + op + "was ignored"));
+                        errors.add(new Pair("(Warning)", "Backward operator " + op + " was ignored"));
                     }
                 }
                 //MULT_OP일때
                 else if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
                     errors.add(new Pair("(Warning)", "Consecutive operators were found"));
-                    System.out.println("Term cannot be calculated with multiplication and division, so ignore" + lexemes.get(lexemes.size()-1) + "and move on.");
+                    System.out.println("Term cannot be calculated with multiplication and division, so ignore " + lexemes.get(lexemes.size()-1) + " and move on.");
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
@@ -316,11 +316,11 @@ public class Parser {
                         lexemes.remove(lexemes.size() - 1);
                     } else {
                         lexemes.remove(lexemes.size() - 1);
-                        errors.add(new Pair("(Warning)", "Backward operator " + op + "was ignored"));
+                        errors.add(new Pair("(Warning)", "Backward operator " + op + " was ignored"));
                     }
                 } else if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
                     errors.add(new Pair("(Warning)", "Consecutive operators were found"));
-                    System.out.println("Factor cannot be calculated with addition and subtraction, so ignore" + lexemes.get(lexemes.size()-1) + "and move on.");
+                    System.out.println("Factor cannot be calculated with addition and subtraction, so ignore " + lexemes.get(lexemes.size()-1) + " and move on.");
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
