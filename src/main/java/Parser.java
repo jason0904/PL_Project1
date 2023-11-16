@@ -252,12 +252,12 @@ public class Parser {
 
                     } else {
                         lexemes.remove(lexemes.size() - 1);
-                        errors.add(new Pair("(Warning)", "Consecutive operators were found - Backward operator " + op + " was ignored"));
+                        errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + op));
                     }
                 }
                 //MULT_OP일때
                 else if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
-                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove " + lexemes.get(lexemes.size() - 1)));
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward Operator " + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
@@ -315,10 +315,10 @@ public class Parser {
                         lexemes.remove(lexemes.size() - 1);
                     } else {
                         lexemes.remove(lexemes.size() - 1);
-                        errors.add(new Pair("(Warning)", "Consecutive operators were found - Backward operator " + op + " was ignored"));
+                        errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + op));
                     }
                 } else if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
-                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove " + lexemes.get(lexemes.size() - 1)));
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator" + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
