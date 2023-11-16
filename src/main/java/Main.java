@@ -34,5 +34,4 @@ public class Main {
         Program program = new Program(input);
         program.run(optionFlag);
     }
-
 }
