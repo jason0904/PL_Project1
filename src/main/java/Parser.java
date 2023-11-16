@@ -201,7 +201,6 @@ public class Parser {
                 while (nextToken.equals(String.valueOf(Token.ASSIGN_OP))) {
                     errors.add(new Pair("(Warning)", "Consecutive Assignment Operator - Remove Duplicate Assignment Operator"));
                     lexemes.remove(lexemes.size() - 1);
-                    result[2]--;
                     lex();
                 }
                 return expression();
@@ -318,7 +317,7 @@ public class Parser {
                         errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + op));
                     }
                 } else if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
-                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator" + lexemes.get(lexemes.size() - 1)));
+                    errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
                 }
                 else {
