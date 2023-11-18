@@ -178,9 +178,6 @@ public class Parser {
                 getchar();
             }
         }
-        if (optionFlag) {
-            if(!nextToken.equals(String.valueOf(Token.EOF))) System.out.println(lexeme);
-        }
         resetLexeme();
     }
 
@@ -432,6 +429,11 @@ public class Parser {
                 //System.out.println("Result => " + LHS + " = Unknown ");
             }
             errorFlag2 = errorFlag || errorFlag2;
+        }
+        else {
+            for(String str : lexemes) {
+                System.out.println(str);
+            }
         }
     }
 
