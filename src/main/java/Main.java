@@ -32,6 +32,9 @@ public class Main {
         String tmp = lines.toString().replaceAll(" ", "");
         tmp = tmp.replaceAll("\n", "");
         if(tmp.isEmpty()) {
+            if(optionFlag) {
+                return;
+            }
             System.out.println();
             System.out.println("ID : 0 CONST : 0 OP : 0");
             System.out.println("(Error) - There is no input.");
