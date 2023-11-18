@@ -26,7 +26,8 @@ java -jar .\Main.jar -v .\testcase\example1.txt
 2. `Statement`에서 `ASSIGNMENT_OP`가 나오지 않는 경우
 3. `Statement`가 `IDENT`로 시작하지 않는 경우
 4. `$`, `#`같은 예상치 못한 문자가 들어오는 경우
-5. `IDENT`가 연속적으로 나오는 경우
+5. `Operator`가 없을 경우
+6. `Operand`가 없을 경우
 
 ### Warning
 1. `+`, `-`, `*`, `/` 연산자가 연속해서 나오는 경우 두번째 연산자부터 무시
