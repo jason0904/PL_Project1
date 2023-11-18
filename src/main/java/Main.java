@@ -35,7 +35,7 @@ public class Main {
             if(optionFlag) {
                 return;
             }
-            System.out.println();
+            System.out.println("Statement : ");
             System.out.println("ID : 0 CONST : 0 OP : 0");
             System.out.println("(Error) - There is no input.");
             return;
