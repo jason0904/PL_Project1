@@ -28,6 +28,7 @@ java -jar .\Main.jar -v .\testcase\example1.txt
 4. `$`, `#`같은 예상치 못한 문자가 들어오는 경우
 5. `Operator`가 없을 경우
 6. `Operand`가 없을 경우
+7. 파일이 공백일 경우
 
 ### Warning
 1. `+`, `-`, `*`, `/` 연산자가 연속해서 나오는 경우 두번째 연산자부터 무시
