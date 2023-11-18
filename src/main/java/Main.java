@@ -28,6 +28,15 @@ public class Main {
         }
         scanner.close();
 
+        //공백과 개행문자 같이 지음
+        String tmp = lines.toString().replaceAll(" ", "");
+        tmp = tmp.replaceAll("\n", "");
+        if(tmp.isEmpty()) {
+            System.out.println("ID : 0 CONST : 0 OP : 0");
+            System.out.println("(Error) - There is no input.");
+            return;
+        }
+
         //개행문자 제거후 한 문장으로 묶기
         String input;
         input = lines.toString().replaceAll("\n", "");
