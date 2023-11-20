@@ -12,6 +12,7 @@ public class Parser {
     private String LHS;
     private static final TreeSet<String> IdentList = new TreeSet<>();
     private final List<String> lexemes = new ArrayList<>();
+    private final List<String> tokens = new ArrayList<>();
     private final List<Pair> errors = new ArrayList<>();
     private static final HashMap<String, Integer> IdentValue = new HashMap<>();
     private char nextChar;
@@ -58,23 +59,27 @@ public class Parser {
                 addchar();
                 nextToken = String.valueOf(Token.LEFT_PAREN);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
                 result[2]--;
             }
             case ')' -> {
                 addchar();
                 nextToken = String.valueOf(Token.RIGHT_PAREN);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
                 result[2]--;
             }
             case '+', '-' -> {
                 addchar();
                 nextToken = String.valueOf(Token.ADD_OP);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
             }
             case '*', '/' -> {
                 addchar();
                 nextToken = String.valueOf(Token.MULT_OP);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
             }
             case ':' -> {
                 addchar();
@@ -87,12 +92,14 @@ public class Parser {
                 }
                 nextToken = String.valueOf(Token.ASSIGN_OP);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
                 result[2]--;
             }
             case ';' -> {
                 addchar();
                 nextToken = String.valueOf(Token.SEMICOLON);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
                 result[2]--;
             }
             case '=' -> {
@@ -101,12 +108,14 @@ public class Parser {
                 addchar();
                 nextToken = String.valueOf(Token.ASSIGN_OP);
                 addLexeme(lexeme);
+                tokens.add(nextToken);
                 result[2]--;
             }
             case (char)-1 -> {
                 addchar();
                 result[2]--;
                 nextToken = String.valueOf(Token.EOF);
+                tokens.add(nextToken);
             }
             default -> {
                 errorFlag = true;
@@ -114,6 +123,7 @@ public class Parser {
                 addchar();
                 addLexeme(lexeme);
                 nextToken = String.valueOf(Token.ERROR);
+                tokens.add(nextToken);
                 result[2]--;
             }
         }
@@ -160,6 +170,7 @@ public class Parser {
                 addLexeme(lexeme);
                 IdentList.add(lexeme);
                 nextToken = String.valueOf(Token.IDENT);
+                tokens.add(nextToken);
             }
             case "DIGIT" -> {
                 addchar();
@@ -171,8 +182,12 @@ public class Parser {
                 result[1]++;
                 addLexeme(lexeme);
                 nextToken = String.valueOf(Token.INT_LIT);
+                tokens.add(nextToken);
             }
-            case "EOF" -> nextToken = String.valueOf(Token.EOF);
+            case "EOF" -> {
+                nextToken = String.valueOf(Token.EOF);
+                tokens.add(nextToken);
+            }
             case "UNKNOWN" -> {
                 lookup(nextChar);
                 getchar();
@@ -197,6 +212,7 @@ public class Parser {
                 while (nextToken.equals(String.valueOf(Token.ASSIGN_OP))) {
                     errors.add(new Pair("(Warning)", "Consecutive Assignment Operator - Remove Duplicate Assignment Operator"));
                     lexemes.remove(lexemes.size() - 1);
+                    tokens.remove(tokens.size() - 1);
                     lex();
                 }
                 return expression();
@@ -244,9 +260,11 @@ public class Parser {
                     if (lexemes.get(lexemes.size() - 1).equals(op)) {
                         errors.add(new Pair("(Warning)", "Duplicate operators were found - Remove duplicate operator (" + op + ")"));
                         lexemes.remove(lexemes.size() - 1);
+                        tokens.remove(tokens.size() - 1);
 
                     } else {
                         lexemes.remove(lexemes.size() - 1);
+                        tokens.remove(tokens.size() - 1);
                         errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + op));
                     }
                 }
@@ -254,6 +272,7 @@ public class Parser {
                 else if (nextToken.equals(String.valueOf(Token.MULT_OP))) {
                     errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward Operator " + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
+                    tokens.remove(tokens.size() - 1);
                 }
                 else {
                     errorFlag = true;
@@ -308,13 +327,16 @@ public class Parser {
                     if (lexemes.get(lexemes.size() - 1).equals(op)) {
                         errors.add(new Pair("(Warning)", "Duplicate operators were found - Remove duplicate operator (" + op + ")"));
                         lexemes.remove(lexemes.size() - 1);
+                        tokens.remove(tokens.size() - 1);
                     } else {
                         lexemes.remove(lexemes.size() - 1);
                         errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + op));
+                        tokens.remove(tokens.size() - 1);
                     }
                 } else if (nextToken.equals(String.valueOf(Token.ADD_OP))) {
                     errors.add(new Pair("(Warning)", "Consecutive operators were found - Remove Backward operator " + lexemes.get(lexemes.size() - 1)));
                     lexemes.remove(lexemes.size() - 1);
+                    tokens.remove(tokens.size() - 1);
                 }
                 else {
                     errorFlag = true;
@@ -351,6 +373,7 @@ public class Parser {
             } else {
                 errors.add(new Pair("(Warning)", "not found right parenthesis - add right parenthesis in the end"));
                 lexemes.add(")");
+                tokens.add(String.valueOf(Token.RIGHT_PAREN));
                 if(optionFlag) System.out.println(")");
                 return tmp;
             }
@@ -431,7 +454,7 @@ public class Parser {
             errorFlag2 = errorFlag || errorFlag2;
         }
         else {
-            for(String str : lexemes) {
+            for(String str : tokens) {
                 System.out.println(str);
             }
         }
