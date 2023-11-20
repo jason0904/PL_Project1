@@ -374,7 +374,6 @@ public class Parser {
                 errors.add(new Pair("(Warning)", "not found right parenthesis - add right parenthesis in the end"));
                 lexemes.add(")");
                 tokens.add(String.valueOf(Token.RIGHT_PAREN));
-                if(optionFlag) System.out.println(")");
                 return tmp;
             }
         } else if (nextToken.equals(String.valueOf(Token.IDENT))) {
